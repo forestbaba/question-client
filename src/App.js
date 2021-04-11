@@ -1,10 +1,17 @@
-const { default: Forms } = require("./components/Forms");
+import React, { useState } from 'react';
+import Questions from './components/Questions';
+import Forms from './components/Forms'
+import Button from '@material-ui/core/Button';
 
+const App = () => {
+  const [show, setShow] = useState(false);
 
-function App() {
   return (
     <div className="App">
-    <Forms/>
+        <Button variant="contained" color="primary" onClick={() => setShow(!show)}>
+         { show ?  'Show Questions' : 'Show Form'}
+    </Button>
+     { show ? (<Forms />) : (<Questions />)}
     </div>
   );
 }

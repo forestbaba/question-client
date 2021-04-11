@@ -7,6 +7,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import Alert from '@material-ui/lab/Alert';
+import {LOCAL_BASE_URL, REMOTE_BASE_URL} from '../utility/constants'
 
 const axios = require('axios');
 
@@ -48,7 +49,7 @@ const handleSubmit= async()=>{
    
 
    
-      axios.post('https://question-serve.herokuapp.com/create',data)
+      axios.post(`${REMOTE_BASE_URL}/create`,data)
       .then(data =>{
         setSuccessMsg("Question and answers posted successfully ")
         setisSuccess(true)
