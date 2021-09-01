@@ -7,6 +7,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
 import Alert from '@material-ui/lab/Alert';
+// import { v2 as cloudinary, UploadApiResponse } from 'cloudinary'
+
 import { LOCAL_BASE_URL, REMOTE_BASE_URL } from '../utility/constants'
 
 
@@ -35,56 +37,157 @@ const Forms = () => {
   const [errorMsg, setErrorMsg] = useState('')
 
   const [value, setValue] = React.useState('waec');
+  const [isImage, setIsImage] = React.useState('no');
+
+  const [file, setFile] = useState("")
+
 
   const handleChange = (e) => {
     setSubject(e.target.value)
   }
-  const handleRadioChange=(e)=>{
+  const handleRadioChange = (e) => {
     setValue(e.target.value)
   }
+  const handleRadioChangeImage = (e) => {
+    console.log(e.target)
+    setIsImage(e.target.value)
+  }
   const handleSubmit = async () => {
-    
-    setSubmitted(true)
-    let data = {
-      subject,
-      options: [option1, option2, option3, option4],
-      correctOption: answer,
-      question,
-      exam_type:value
-    }
+
+    if (isImage === 'yes' && file) {
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'fqczec5i')
+      axios.post('https://api.cloudinary.com/v1_1/dv4lewpt0/image/upload', formData)
+        .then(response => {
+
+          let imageUrl = response.data.secure_url
+
+          setSubmitted(true)
+          let data = {
+            subject,
+            options: [option1, option2, option3, option4],
+            correctOption: answer,
+            question,
+            exam_type: value,
+            image: imageUrl
+          }
+          setFile(null);
+          
+          if (option1.length === 0 || option2.length === 0 || option3.length === 0 || option4.length === 0 ||
+            answer.length === 0 || question.length === 0 || subject.length === 0) {
+            setIsError(true)
+          } else {
 
 
-    if (option1.length === 0 || option2.length === 0 || option3.length === 0 || option4.length === 0 ||
-      answer.length === 0 || question.length === 0 || subject.length === 0) {
-      setIsError(true)
+            axios.post(`${LOCAL_BASE_URL}/create`, data)
+              .then(data => {
+                setSuccessMsg("Question and answers posted successfully ")
+                setisSuccess(true)
+                setIsError(false)
+                setSubmitted(false)
+                setSubject('')
+                setQuestion('')
+                setAnswer('')
+                setOption1('')
+                setOption2('')
+                setOption3('')
+                setOption4('')
+                alert("Question created")
+              }).catch(err => {
+                setErrorMsg("Error posting questions and answers")
+                setisSuccess(false)
+                setIsError(true)
+                console.log('ERR: ', err)
+              })
+          }
+
+
+
+        }).catch(err => {
+          console.log(err)
+        })
     } else {
 
+      setSubmitted(true)
+      let data = {
+        subject,
+        options: [option1, option2, option3, option4],
+        correctOption: answer,
+        question,
+        exam_type: value
+      }
 
 
-      axios.post(`${REMOTE_BASE_URL}/create`, data)
-        .then(data => {
-          setSuccessMsg("Question and answers posted successfully ")
-          setisSuccess(true)
-          setIsError(false)
-          setSubmitted(false)
-          setSubject('')
-          setQuestion('')
-          setAnswer('')
-          setOption1('')
-          setOption2('')
-          setOption3('')
-          setOption4('')
-          alert("Question created")
-        }).catch(err => {
-          setErrorMsg("Error posting questions and answers")
-          setisSuccess(false)
-          setIsError(true)
-          console.log('ERR: ', err)
-        })
+      if (option1.length === 0 || option2.length === 0 || option3.length === 0 || option4.length === 0 ||
+        answer.length === 0 || question.length === 0 || subject.length === 0) {
+        setIsError(true)
+      } else {
+
+
+        axios.post(`${LOCAL_BASE_URL}/create`, data)
+          .then(data => {
+            setSuccessMsg("Question and answers posted successfully ")
+            setisSuccess(true)
+            setIsError(false)
+            setSubmitted(false)
+            setSubject('')
+            setQuestion('')
+            setAnswer('')
+            setOption1('')
+            setOption2('')
+            setOption3('')
+            setOption4('')
+            alert("Question created")
+          }).catch(err => {
+            setErrorMsg("Error posting questions and answers")
+            setisSuccess(false)
+            setIsError(true)
+            console.log('ERR: ', err)
+          })
+      }
+
+
     }
 
-    console.log('The data: ', data)
+
+
+
   }
+
+
+  const handleImageChange = (e) => {
+    console.log('[]:', e.target.files[0])
+    setFile(e.target.files[0])
+
+    //  if(file){
+
+
+
+    //  cloudinary.config({
+    //   cloud_name: 'dv4lewpt0',
+    //   // cloud_name: process.env.CLOUDINARY_NAME,
+    //   api_key:'565372365571999',
+    //   api_secret: 's05Cx2lJfB2_0zAehc4pZvAWkSw',
+    //   shorten: true,
+    //   secure: true,
+    //   ssl_detected: true
+    // })
+
+    //     // filename = req.file.path from multer
+    // cloudinary.uploader
+    //   .upload(file, { async: true, unique_filename: true, quality_analysis: true })
+    //   .then(response => {
+    //     console.log(response)
+    //   })
+    //   .catch((error) => {
+    //     console.log(error)
+    //   })
+    // }
+  }
+
+
   return (
     <div className="form-parent">
 
@@ -105,7 +208,7 @@ const Forms = () => {
       <FormControl variant="filled"
         className={submitted && subject.length === 0 ? "error" : "textfield"}
       >
-     <InputLabel id="demo-simple-select-filled-label">Subject</InputLabel>
+        <InputLabel id="demo-simple-select-filled-label">Subject</InputLabel>
         <Select
           labelId="demo-simple-select-filled-label"
           id="demo-simple-select-filled"
@@ -130,13 +233,33 @@ const Forms = () => {
 
       </FormControl>
       <FormControl component="fieldset">
-      <FormLabel component="legend">Select Exam type</FormLabel>
-      <RadioGroup aria-label="subject" name="subject1" value={value} onChange={handleRadioChange}>
-        <FormControlLabel value="waec" control={<Radio />} label="WAEC" />
-        <FormControlLabel value="jamb" control={<Radio />} label="JAMB" />
-      </RadioGroup>
-    </FormControl>
-    
+        <FormLabel component="legend">Select Exam type</FormLabel>
+        <RadioGroup aria-label="subject" name="subject1" value={value} onChange={handleRadioChange}>
+          <FormControlLabel value="waec" control={<Radio />} label="WAEC" />
+          <FormControlLabel value="jamb" control={<Radio />} label="JAMB" />
+        </RadioGroup>
+      </FormControl>
+
+      <hr />
+      <FormControl component="fieldset">
+        <FormLabel component="legend">Is there Image ?</FormLabel>
+        <RadioGroup aria-label="image" name="image" value={isImage} onChange={handleRadioChangeImage}>
+          <FormControlLabel value="no" control={<Radio />} label="No" />
+          <FormControlLabel value="yes" control={<Radio />} label="Yes" />
+        </RadioGroup>
+
+        {
+          isImage === "yes" ? (
+            <>
+              <input type="file" onChange={handleImageChange} />
+              <img src={file ? URL.createObjectURL(file) : null} style={{ width: '200px', height: "200px", marginTop: '20px', marginBottom: '20px' }} />
+            </>
+          ) : null
+        }
+
+      </FormControl>
+      <hr />
+
       { submitted && isError === true ? (<p>All fields highlighted in red are required</p>) : null}
       <TextField
         id="outlined-multiline-static"
