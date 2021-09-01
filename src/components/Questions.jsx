@@ -18,12 +18,9 @@ const Questions = () => {
 	const [ qid, setQid ] = React.useState('');
 
 	useEffect(() => {
-		console.log('RRR');
-
 		axios
 			.get(`${REMOTE_BASE_URL}/fetchLastTen`)
 			.then((data) => {
-				console.log(data.data);
 				setQuestions(data.data.questions);
 			})
 			.catch((err) => {
@@ -32,7 +29,6 @@ const Questions = () => {
 	}, []);
 
 	const handleClickOpen = (id) => {
-		console.log('===id: ', id);
 		setOpen(true);
 		setQid(id);
 	};
@@ -85,15 +81,14 @@ const Questions = () => {
 					const d1 = moment(dater);
 					const d12 = moment(item.date_created);
 
-					console.log('YYY', item.date_created);
-					console.log('YY*******YY', d12);
+			
 
 					const diffDays = d1.diff(d12, 'days');
-					console.log('YY*******YY', diffDays);
 
 					return (
 						<div className="question-container" key={index}>
 							<p className="question">{item.question}</p>
+							{item.has_image ? (<img src={item.image_url} width={200} height={200}/>) : null}
 							{item.options.map((item, index) => {
 								return (
 									<p key={index}>
