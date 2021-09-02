@@ -81,7 +81,7 @@ const Forms = () => {
           } else {
 
 
-            axios.post(`${LOCAL_BASE_URL}/create`, data)
+            axios.post(`${REMOTE_BASE_URL}/create`, data)
               .then(data => {
                 setSuccessMsg("Question and answers posted successfully ")
                 setisSuccess(true)
@@ -126,7 +126,7 @@ const Forms = () => {
       } else {
 
 
-        axios.post(`${LOCAL_BASE_URL}/create`, data)
+        axios.post(`${REMOTE_BASE_URL}/create`, data)
           .then(data => {
             setSuccessMsg("Question and answers posted successfully ")
             setisSuccess(true)
