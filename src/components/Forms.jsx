@@ -219,6 +219,7 @@ const Forms = () => {
             <em>None</em>
           </MenuItem>
           <MenuItem value={'english'}>English</MenuItem>
+          <MenuItem value={'oralenglish'}>Oral English</MenuItem>
           <MenuItem value={'mathematics'}>Mathematics</MenuItem>
           <MenuItem value={'biology'}>Biology</MenuItem>
           <MenuItem value={'physics'}>Physics</MenuItem>
